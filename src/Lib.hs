@@ -77,6 +77,8 @@ data TermP = TermP TermS
            -- (4*) +10%
            | Minus TermP TermP
            | Divide TermP TermP
+           -- (5*) +50%
+           | Y TermP
            -- (7)
            | Cons TermP TermP
            | Nil
@@ -92,9 +94,13 @@ successor n f x = app (sym f) $ successor (n - 1) f x
 plus = lam "n" $ lam "m" $ lam "f" $ lam "x" $ app (app (sym "n") (sym "f")) $ app (app (sym "m") (sym "f")) $ sym "x"
 multiply = lam "n" $ lam "m" $ lam "f" $ lam "x" $ app (app (sym "n") (app (sym "m") (sym "f"))) $ sym "x"
 
+ycomb = lam "f" $ app y y where
+  y = lam "x" $ app (sym "f") $ app (sym "x") (sym "x")
+
 toTermS (Natural num) = lam "f" $ lam "x" $ successor num "f" "x"
 toTermS (Plus n1 n2) = app (app plus $ toTermS n1) $ toTermS n2
 toTermS (Mult n1 n2) = app (app multiply $ toTermS n1) $ toTermS n2
+toTermS (Y t) = app ycomb $ toTermS t
 
 toTermS (TermP term) = term
 
