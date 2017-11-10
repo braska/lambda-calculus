@@ -41,6 +41,9 @@ betaI (AppI (LamI t1) t2) = Just $ doApp t1 t2
 betaI (AppI (AppI t1 t2) t3) = case (betaI $ AppI t1 t2) of
   Just innerT -> Just $ AppI innerT t3
   Nothing -> Nothing
+betaI (AppI t1 t2) = case betaI t2 of
+  Just innerT -> Just (AppI t1 innerT)
+  Nothing -> Nothing
 
 doApp :: TermI -> TermI -> TermI
 doApp t1 t2 = doApp' t1 t2 0
@@ -83,6 +86,11 @@ data TermP = TermP TermS
            deriving (Eq,Show,Read)
 
 toTermS :: TermP -> TermS
+
+successor 0 f x = sym x
+successor n f x = app (sym f) $ successor (n - 1) f x
+toTermS (Natural num) = lam "f" $ lam "x" $ successor num "f" "x"
+
 toTermS (TermP term) = term
 
 solve :: TermP -> Either TermI TermS
