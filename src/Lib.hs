@@ -89,7 +89,12 @@ toTermS :: TermP -> TermS
 
 successor 0 f x = sym x
 successor n f x = app (sym f) $ successor (n - 1) f x
+plus = lam "n" $ lam "m" $ lam "f" $ lam "x" $ app (app (sym "n") (sym "f")) $ app (app (sym "m") (sym "f")) $ sym "x"
+multiply = lam "n" $ lam "m" $ lam "f" $ lam "x" $ app (app (sym "n") (app (sym "m") (sym "f"))) $ sym "x"
+
 toTermS (Natural num) = lam "f" $ lam "x" $ successor num "f" "x"
+toTermS (Plus n1 n2) = app (app plus $ toTermS n1) $ toTermS n2
+toTermS (Mult n1 n2) = app (app multiply $ toTermS n1) $ toTermS n2
 
 toTermS (TermP term) = term
 
