@@ -68,27 +68,12 @@ full a b term = lastUnf 10000 b (a term)
           Just y -> lastUnf (n-1) f y
 
 data TermP = TermP TermS
-           -- (3)
-           | Boolean Bool
-           | Iff TermP TermP TermP
-           | Not TermP
-           | And TermP TermP
-           | Or TermP TermP
-           -- (4)
            | Natural Int
            | Plus TermP TermP
            | Mult TermP TermP
            -- (4*) +10%
            | Minus TermP TermP
            | Divide TermP TermP
-           -- (5*) +50%
-           | Y TermP
-           -- (5**) +50%
-           -- mutually recursive
-           -- (6)
-           | Pair TermP TermP
-           | Fst TermP
-           | Snd TermP
            -- (7)
            | Cons TermP TermP
            | Nil
