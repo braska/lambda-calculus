@@ -71,6 +71,8 @@ full a b term = lastUnf 10000 b (a term)
           Just y -> lastUnf (n-1) f y
 
 data TermP = TermP TermS
+           | Boolean Bool
+           -- (4)
            | Natural Int
            | Plus TermP TermP
            | Mult TermP TermP
@@ -91,16 +93,24 @@ toTermS :: TermP -> TermS
 
 successor 0 f x = sym x
 successor n f x = app (sym f) $ successor (n - 1) f x
+
 plus = lam "n" $ lam "m" $ lam "f" $ lam "x" $ app (app (sym "n") (sym "f")) $ app (app (sym "m") (sym "f")) $ sym "x"
 multiply = lam "n" $ lam "m" $ lam "f" $ lam "x" $ app (app (sym "n") (app (sym "m") (sym "f"))) $ sym "x"
 
 ycomb = lam "f" $ app y y where
   y = lam "x" $ app (sym "f") $ app (sym "x") (sym "x")
 
-toTermS (Natural num) = lam "f" $ lam "x" $ successor num "f" "x"
+false = lam "f" $ lam "x" $ sym "x"
+true = lam "f" $ lam "x" $ sym "f"
+
+churchNumber num = lam "f" $ lam "x" $ successor num "f" "x"
+
+toTermS (Natural num) = churchNumber num
 toTermS (Plus n1 n2) = app (app plus $ toTermS n1) $ toTermS n2
 toTermS (Mult n1 n2) = app (app multiply $ toTermS n1) $ toTermS n2
 toTermS (Y t) = app ycomb $ toTermS t
+toTermS (Boolean True) = true
+toTermS (Boolean False) = false
 
 toTermS (TermP term) = term
 
